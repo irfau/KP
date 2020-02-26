@@ -1,0 +1,59 @@
+#include <EEPROM.h>
+void writeString(char add,String data);
+String read_String(char add); 
+
+void setup() {
+  Serial.begin(9600);
+  EEPROM.begin(512);
+//  String data = "Selamat Pagi";
+  Serial.print("Writing Data:");
+    Serial.print("Message:");
+//  writeString(10, data);  
+  delay(10);
+  }
+void loop() {
+  String recivedData;
+  recivedData = read_String(10);
+  Serial.print("Read Data:");
+  Serial.println(recivedData);
+  delay(1000);
+  String content = "";
+  char character;
+
+  while(Serial.available()) {
+      character = Serial.read();
+      content.concat(character);}
+
+  if (content != "") {
+    Serial.println(content);
+    writeString(10, content);  
+  }
+  
+}
+ 
+void writeString(char add,String data){
+  int _size = data.length();
+  int i;
+  for(i=0;i<_size;i++){
+    EEPROM.write(add+i,data[i]);
+    }
+  EEPROM.write(add+_size,'\0');   //Add termination null character for String Data
+  EEPROM.commit();
+}
+ 
+ 
+String read_String(char add){
+  int i;
+  char data[100]; //Max 100 Bytes
+  int len=0;
+  unsigned char k;
+  k=EEPROM.read(add);
+  while(k != '\0' && len<500)   
+  {    
+    k=EEPROM.read(add+len);
+    data[len]=k;
+    len++;
+  }
+  data[len]='\0';
+  return String(data);
+}
